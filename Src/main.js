@@ -1,4 +1,4 @@
-// Variavel Para Reajustar Os Ponto Baseado Na Posição Da Tela
+// Variavel Para Reajustar Os Pontos Baseados Na Posição Da Tela
 var tamanhoAtualCanvas;
 
 var grid
@@ -6,7 +6,14 @@ var grid
 function setup() {
     createCanvas(windowWidth, windowHeight);
     tamanhoAtualCanvas = createVector(windowWidth, windowHeight);
-    grid = new Grid(10)
+
+    // Instancia O Grid
+    grid = new Grid(20)
+
+    // Decide O Valor De Cada Ponto Baseado Num Algoritmo De Noise
+    for (let x = 0; x < grid.numeroDePontos.x; x++)
+        for (let y = 0; y < grid.numeroDePontos.y; y++)
+            grid.setarValorDePonto(x,y,noise(x,y));
 }
 
 function draw() {

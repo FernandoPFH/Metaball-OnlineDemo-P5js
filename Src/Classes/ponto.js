@@ -1,12 +1,13 @@
 class Ponto {
-    constructor(posicao,valor) {
+    constructor(posicao,valor,cor) {
         this.posicao = posicao;
         this.valor = valor;
+        this.cor = cor;
     }
 
     // Desenha O Ponto
     desenhar() {
-        stroke(255 * this.valor);
+        stroke(this.cor);
         point(this.posicao.x,this.posicao.y);
     }
 }

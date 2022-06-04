@@ -4,6 +4,8 @@ class Grid {
         this.numeroDePontos = createVector((int)(width/espacoEntrePontos) + 1,(int)(height/espacoEntrePontos) + 1);
 
         this.pontos = this.atualizarListaDePontos();
+
+        this.teste = 0.5;
     }
 
     // Atualiza A Lista De Pontos
@@ -29,10 +31,19 @@ class Grid {
         this.pontos[posX][posY].cor = cor;
     }
 
+    resetarValorECorDosPOntos() {
+        this.pontos.forEach(linhaDePontos => {
+            linhaDePontos.forEach(ponto => {
+                ponto.valor = 0;
+                ponto.cor = color("black");
+            });
+        });
+    }
+
     // Desenha O Meio Do Algoritmo De Marching Squares
     desenharMeioDoMarchingSquares(pontoSuperiorEsquerdo,pontoSuperiorDireito,pontoInferiorEsquerdo,pontoInferiorDireito) {
         // Converte O Valor Dos Pontos Em Um Número Total Binário Que É Usado Como O Indice Do Algoritmo
-        let marchingSquareIndice = (pontoSuperiorEsquerdo.valor > 0.5) * 8 + (pontoSuperiorDireito.valor > 0.5) * 4 + (pontoInferiorDireito.valor > 0.5) * 2 + (pontoInferiorEsquerdo.valor > 0.5) * 1;
+        let marchingSquareIndice = (pontoSuperiorEsquerdo.valor > this.teste) * 8 + (pontoSuperiorDireito.valor > this.teste) * 4 + (pontoInferiorDireito.valor > this.teste) * 2 + (pontoInferiorEsquerdo.valor > this.teste) * 1;
 
         // Criação Dos Pontos Entre Os Pontos De Referencia
         let pontoMeioCima = createVector(pontoSuperiorEsquerdo.posicao.x + (pontoSuperiorEsquerdo.valor/(pontoSuperiorEsquerdo.valor + pontoSuperiorDireito.valor)) * this.espacoEntrePontos,pontoSuperiorEsquerdo.posicao.y);
@@ -274,7 +285,7 @@ class Grid {
         for (let x = 0; x < this.numeroDePontos.x-1; x++)
             for (let y = 0; y < this.numeroDePontos.y-1; y++) {
                 this.desenharMeioDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1])
-                this.desenharContornoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1])
+                // this.desenharContornoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1])
             }
     }
 }

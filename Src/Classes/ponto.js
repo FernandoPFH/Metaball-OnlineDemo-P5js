@@ -7,7 +7,7 @@ class Ponto {
 
     // Desenha O Ponto
     desenhar() {
-        stroke(this.cor);
+        stroke(255);
         point(this.posicao.x,this.posicao.y);
     }
 }

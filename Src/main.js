@@ -47,6 +47,13 @@ function draw() {
 
 // Troca O Tamanho Do Canvas Quando O Tamanho Da Tela É Mudado
 function windowResized() {
+    metaballs.forEach(metaball => {
+        let novaPosicaoXDoPonto = (metaball.posicao.x - 0) * (windowWidth - 0) / (tamanhoAtualCanvas.x - 0) + 0;
+        let novaPosicaoYDoPonto = (metaball.posicao.y - 0) * (windowHeight - 0) / (tamanhoAtualCanvas.y - 0) + 0;
+
+        metaball.posicao = createVector(novaPosicaoXDoPonto,novaPosicaoYDoPonto);
+    })
+
     tamanhoAtualCanvas = createVector(windowWidth, windowHeight);
 
     resizeCanvas(windowWidth, windowHeight);

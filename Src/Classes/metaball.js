@@ -1,9 +1,14 @@
 class Metaball {
-    constructor(posicaoInicial,raio,cor,velocidadeInicial) {
-        this.posicao = posicaoInicial;
-        this.cor = cor;
-        this.raio = raio;
-        this.velocidade = velocidadeInicial;
+    constructor() {
+        this.raio = random(20,80);
+
+        this.posicao = createVector(random(0+this.raio,width-this.raio),random(0+this.raio,height-this.raio));
+
+        this.cor = color(random(["yellow","orange","red","violet","blue","green"]));
+
+        let magnitudeVelocidadeInicial = random(50,300);
+
+        this.velocidade = createVector(random(-1,1) * magnitudeVelocidadeInicial,random(-1,1) * magnitudeVelocidadeInicial);
     }
 
     // Move A Metabola

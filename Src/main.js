@@ -2,6 +2,7 @@
 var tamanhoAtualCanvas;
 
 var grid;
+var metaballs = [];
 var metaball;
 var metaball2;
 
@@ -14,27 +15,29 @@ function setup() {
     // Instancia O Grid
     grid = new Grid(10);
 
-    metaball = new Metaball(createVector(width/2,height/2),45,color("red"),createVector(0,-150));
-    metaball2 = new Metaball(createVector(width/2,height/2),45,color("blue"),createVector(0,150));
-
     // Decide O Valor E Ponto De Cada Ponto Baseado Num Algoritmo De Noise
     for (let x = 0; x < grid.numeroDePontos.x; x++)
         for (let y = 0; y < grid.numeroDePontos.y; y++)
             grid.setarValorDePonto(x,y,-1,color(0,0,0,0));
+
+    for (let index = 0; index < 20; index++)
+        metaballs[index] = new Metaball();
 }
 
 function draw() {
     background(51);
 
-    metaball.andar();
-    metaball2.andar();
+    metaballs.forEach(metaball => {
+        metaball.andar();
+    });
 
     for (let x = 0; x < grid.numeroDePontos.x; x++)
         for (let y = 0; y < grid.numeroDePontos.y; y++) {
             grid.setarValorDePonto(x,y,-1,color(0,0,0,0));
 
-            metaball.atualizarPonto(grid.pontos[x][y]);
-            metaball2.atualizarPonto(grid.pontos[x][y]);
+            metaballs.forEach(metaball => {
+                metaball.atualizarPonto(grid.pontos[x][y]);
+            });
         }
 
     grid.desenhar();

@@ -2,7 +2,8 @@ class Metaball {
     constructor() {
         this.raio = random(20,80);
 
-        this.posicao = createVector(random(0+this.raio,width-this.raio),random(0+this.raio,height-this.raio));
+        // this.posicao = createVector(random(0+this.raio,width-this.raio),random(0+this.raio,height-this.raio));
+        this.posicao = createVector(width/2,height/2);
 
         this.cor = color(random(["yellow","orange","red","violet","blue","green"]));
 
@@ -33,14 +34,12 @@ class Metaball {
         let vetorEntrePontoPosicaoECentro = createVector(this.posicao.x - ponto.posicao.x, this.posicao.y - ponto.posicao.y);
         let distancia = sqrt(Math.pow(vetorEntrePontoPosicaoECentro.x,2) + Math.pow(vetorEntrePontoPosicaoECentro.y,2));
 
-        // Se O Ponto Estiver Dentro Da Metabola, Calcula Seu Valor
+        ponto.valor = (this.raio - distancia);
+        
         if (distancia < (this.raio)) {
-            let valorASerSetado = 1 - (Math.abs(this.raio - distancia) / (this.raio));
-            // Se O Ponto Já Tiver Uma Cor, Pega A Cor Entre A Atual E A Da Metabola
-            if (ponto.cor != color(0,0,0,0)) {
-                ponto.cor = lerpColor(this.cor,ponto.cor,(valorASerSetado/(valorASerSetado+ponto.valor)));
-            }
-            ponto.valor = valorASerSetado;
+            ponto.cor = this.cor;
+        } else {
+            ponto.cor = null;
         }
     }
 

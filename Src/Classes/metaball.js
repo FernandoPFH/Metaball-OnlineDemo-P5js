@@ -17,12 +17,12 @@ class Metaball {
         this.posicao = createVector(this.posicao.x + this.velocidade.x * (deltaTime / 1000),this.posicao.y + this.velocidade.y * (deltaTime / 1000));
 
         // Se A Metabola Tiver Utrapassado Os Limites Da Tela, Inverte A  Velocidade Em X
-        if (this.posicao.x - this.raio < 0 || this.posicao.x + this.raio > width) {
+        if ((this.posicao.x - this.raio < 0 && this.velocidade.x < 0) || (this.posicao.x + this.raio > width && this.velocidade.x > 0)) {
             this.velocidade.x *= -1;
         }
 
         // Se A Metabola Tiver Utrapassado Os Limites Da Tela, Inverte A  Velocidade Em Y
-        if (this.posicao.y - this.raio  < 0 || this.posicao.y + this.raio > height) {
+        if ((this.posicao.y - this.raio  < 0 && this.velocidade.y < 0) || (this.posicao.y + this.raio > height && this.velocidade.y > 0)) {
             this.velocidade.y *= -1;
         }
     }

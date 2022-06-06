@@ -1,13 +1,14 @@
 class Grid {
     constructor (espacoEntrePontos) {
         this.espacoEntrePontos = espacoEntrePontos;
-        this.numeroDePontos = createVector((int)(width/espacoEntrePontos) + 1,(int)(height/espacoEntrePontos) + 1);
 
-        this.pontos = this.atualizarListaDePontos();
+        this.atualizarListaDePontos();
     }
 
     // Atualiza A Lista De Pontos
     atualizarListaDePontos() {
+        this.numeroDePontos = createVector((int)(width/this.espacoEntrePontos) + 1,(int)(height/this.espacoEntrePontos) + 1);
+
         // Cria Uma Lista De 2 Dimensões Com O Tamanho Do Número De Pontos
         let pontos = new Array(this.numeroDePontos.x);
         for (let index = 0; index < this.numeroDePontos.x; index++) {
@@ -20,7 +21,7 @@ class Grid {
                 pontos[x][y] = new Ponto(createVector(x*this.espacoEntrePontos,y*this.espacoEntrePontos),0);
 
         // Retorna A Lista De Pontos
-        return pontos;
+        this.pontos = pontos;
     }
 
     // Seta Valor De Ponto Baseado Na Posição
@@ -29,22 +30,17 @@ class Grid {
         this.pontos[posX][posY].cor = cor;
     }
 
-    resetarValorECorDosPOntos() {
-        this.pontos.forEach(linhaDePontos => {
-            linhaDePontos.forEach(ponto => {
-                ponto.valor = -1;
-                ponto.cor = color(0,0,0,0);
-            });
-        });
-    }
-
+    // Calcula A Cor De Um Quadrado Do Marching Squares
     calculoDeCor(listaDeCor, listaDeValor) {
+        // Se A Lista Só Tiver Uma Cor, Retorna A Cor
         if (listaDeCor.length <= 1)
             return listaDeCor[0];
 
+        // Cria Uma Lista De Cores E Uma De Valores
         let listaDeCorProcessado = [];
         let listaDeValorProcessado = [];
 
+        // Calcula O Meio Termo Das Cores
         for (let indiceDaCor = 0; indiceDaCor < listaDeCor.length - 1; indiceDaCor++) {
             let valorDeLerp = listaDeValor[indiceDaCor]/(listaDeValor[indiceDaCor] + listaDeValor[indiceDaCor + 1]);
 
@@ -52,6 +48,7 @@ class Grid {
             listaDeValorProcessado.push(valorDeLerp);
         }
 
+        // Se Chama Até QueSó Tiver Uma Cor Na Lista
         return this.calculoDeCor(listaDeCorProcessado,listaDeValorProcessado);
     }
 
@@ -59,7 +56,8 @@ class Grid {
     desenharMeioDoMarchingSquares(pontoSuperiorEsquerdo,pontoSuperiorDireito,pontoInferiorEsquerdo,pontoInferiorDireito) {
         // Converte O Valor Dos Pontos Em Um Número Total Binário Que É Usado Como O Indice Do Algoritmo
         let marchingSquareIndice = (pontoSuperiorEsquerdo.valor >= 0) * 8 + (pontoSuperiorDireito.valor >= 0) * 4 + (pontoInferiorDireito.valor >= 0) * 2 + (pontoInferiorEsquerdo.valor >= 0) * 1;
-
+        
+        // Converte Todos Os Valores Para Positivo
         let valorSuperiorEsquerdo = Math.abs(pontoSuperiorEsquerdo.valor);
         let valorSuperiorDireito = Math.abs(pontoSuperiorDireito.valor);
         let valorInferiorDireito = Math.abs(pontoInferiorDireito.valor);
@@ -71,30 +69,35 @@ class Grid {
         let pontoMeioDireito = createVector(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y + (valorSuperiorDireito/(valorSuperiorDireito + valorInferiorDireito)) * this.espacoEntrePontos);
         let pontoMeioBaixo = createVector(pontoInferiorEsquerdo.posicao.x + (valorInferiorEsquerdo/(valorInferiorEsquerdo + valorInferiorDireito)) * this.espacoEntrePontos,pontoInferiorEsquerdo.posicao.y)
 
+        // Cria Uma Lista De Cores E Uma De Valores
         let listaDeCores = [];
-
         let listaDeValores = [];
 
+        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
         if (pontoSuperiorEsquerdo.cor != null) {
             listaDeCores.push(pontoSuperiorEsquerdo.cor);
             listaDeValores.push(valorSuperiorEsquerdo);
         }
 
+        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
         if (pontoSuperiorDireito.cor != null) {
             listaDeCores.push(pontoSuperiorDireito.cor);
             listaDeValores.push(valorSuperiorDireito);
         }
 
+        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
         if (pontoInferiorEsquerdo.cor != null) {
             listaDeCores.push(pontoInferiorEsquerdo.cor);
             listaDeValores.push(valorInferiorDireito);
         }
 
+        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
         if (pontoInferiorDireito.cor != null) {
             listaDeCores.push(pontoInferiorDireito.cor);
             listaDeValores.push(valorInferiorEsquerdo);
         }
 
+        // Calcula A Cor Total Do Quadrado Do Marching Squares
         let corFigura = this.calculoDeCor(listaDeCores,listaDeValores);
 
         // Retira As Linhas E Preenche Com A Cor Calculada
@@ -219,7 +222,6 @@ class Grid {
                 vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
                 vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
                 break;
-            
         }
 
         // Termina A Figura
@@ -231,6 +233,7 @@ class Grid {
         // Converte O Valor Dos Pontos Em Um Número Total Binário Que É Usado Como O Indice Do Algoritmo
         var marchingSquareIndice = (pontoSuperiorEsquerdo.valor >= 0) * 8 + (pontoSuperiorDireito.valor >= 0) * 4 + (pontoInferiorDireito.valor >= 0) * 2 + (pontoInferiorEsquerdo.valor >= 0) * 1;
 
+        // Converte Todos Os Valores Para Positivo
         let valorSuperiorEsquerdo = Math.abs(pontoSuperiorEsquerdo.valor);
         let valorSuperiorDireito = Math.abs(pontoSuperiorDireito.valor);
         let valorInferiorDireito = Math.abs(pontoInferiorDireito.valor);
@@ -316,17 +319,17 @@ class Grid {
     // Desenha O Grid
     desenhar() {
         // Loopa Por Todos Os Pontos E Desenha Eles
-        this.pontos.forEach(linhaDePontos => {
-            linhaDePontos.forEach(ponto => {
-                // ponto.desenhar();
-            });
-        });
+        // this.pontos.forEach(linhaDePontos => {
+        //     linhaDePontos.forEach(ponto => {
+        //         ponto.desenhar();
+        //     });
+        // });
 
         // Desenha O Resultado Do Algoritmo De Marching Squares
         for (let x = 0; x < this.numeroDePontos.x-1; x++)
             for (let y = 0; y < this.numeroDePontos.y-1; y++) {
                 this.desenharMeioDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
-                //  this.desenharContornoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
+                // this.desenharContornoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
             }
     }
 }

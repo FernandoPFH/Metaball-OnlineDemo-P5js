@@ -1,3 +1,18 @@
+function coresSaoIguais(corA,corB) {
+    if (corA == null || corB == null)
+        return false;
+    return corA.levels[0] == corB.levels[0] && corA.levels[1] == corB.levels[1] && corA.levels[2] == corB.levels[2] && corA.levels[3] == corB.levels[3];
+}
+
+function corEstaNaLista(listaDeCores, cor) {
+    listaDeCores.forEach(corDaLista => {
+        if (coresSaoIguais(corDaLista,cor))
+            return true;
+    });
+
+    return false;
+}
+
 class Grid {
     constructor (espacoEntrePontos) {
         this.espacoEntrePontos = espacoEntrePontos;
@@ -7,7 +22,7 @@ class Grid {
 
     // Atualiza A Lista De Pontos
     atualizarListaDePontos() {
-        this.numeroDePontos = createVector((int)(width/this.espacoEntrePontos) + 1,(int)(height/this.espacoEntrePontos) + 1);
+        this.numeroDePontos = createVector((int)(width/this.espacoEntrePontos) + 1,(int)(height/this.espacoEntrePontos) + 2);
 
         // Cria Uma Lista De 2 Dimensões Com O Tamanho Do Número De Pontos
         let pontos = new Array(this.numeroDePontos.x);
@@ -16,8 +31,8 @@ class Grid {
         }
 
         // Popula A Lista Com Pontos De Valor Padrão "0"
-        for (let x = 0; x < this.numeroDePontos.x; x++)
-            for (let y = 0; y < this.numeroDePontos.y; y++)
+        for (let y = 0; y < this.numeroDePontos.y; y++)
+            for (let x = 0; x < this.numeroDePontos.x; x++)
                 pontos[x][y] = new Ponto(createVector(x*this.espacoEntrePontos,y*this.espacoEntrePontos),0);
 
         // Retorna A Lista De Pontos
@@ -53,179 +68,287 @@ class Grid {
     }
 
     // Desenha O Meio Do Algoritmo De Marching Squares
-    desenharMeioDoMarchingSquares(pontoSuperiorEsquerdo,pontoSuperiorDireito,pontoInferiorEsquerdo,pontoInferiorDireito) {
-        // Converte O Valor Dos Pontos Em Um Número Total Binário Que É Usado Como O Indice Do Algoritmo
-        let marchingSquareIndice = (pontoSuperiorEsquerdo.valor >= 0) * 8 + (pontoSuperiorDireito.valor >= 0) * 4 + (pontoInferiorDireito.valor >= 0) * 2 + (pontoInferiorEsquerdo.valor >= 0) * 1;
-        
-        // Converte Todos Os Valores Para Positivo
-        let valorSuperiorEsquerdo = Math.abs(pontoSuperiorEsquerdo.valor);
-        let valorSuperiorDireito = Math.abs(pontoSuperiorDireito.valor);
-        let valorInferiorDireito = Math.abs(pontoInferiorDireito.valor);
-        let valorInferiorEsquerdo = Math.abs(pontoInferiorEsquerdo.valor);
+    desenhoDeCadaQuadradoDoMarchingSquares(pontoSuperiorEsquerdo,pontoSuperiorDireito,pontoInferiorEsquerdo,pontoInferiorDireito) {
+        // Inicia A Lista De Possiveis Cores 
+        let listaDePossiveisCores = [];
 
-        // Criação Dos Pontos Entre Os Pontos De Referencia
-        let pontoMeioCima = createVector(pontoSuperiorEsquerdo.posicao.x + (valorSuperiorEsquerdo/(valorSuperiorEsquerdo + valorSuperiorDireito)) * this.espacoEntrePontos,pontoSuperiorEsquerdo.posicao.y);
-        let pontoMeioEsquerdo = createVector(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y + (valorSuperiorEsquerdo/(valorSuperiorEsquerdo + valorInferiorEsquerdo)) * this.espacoEntrePontos);
-        let pontoMeioDireito = createVector(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y + (valorSuperiorDireito/(valorSuperiorDireito + valorInferiorDireito)) * this.espacoEntrePontos);
-        let pontoMeioBaixo = createVector(pontoInferiorEsquerdo.posicao.x + (valorInferiorEsquerdo/(valorInferiorEsquerdo + valorInferiorDireito)) * this.espacoEntrePontos,pontoInferiorEsquerdo.posicao.y)
+        // Adiciona As Cores Dos Pontos A Lista 
+        listaDePossiveisCores.push(pontoSuperiorEsquerdo.cor);
+        listaDePossiveisCores.push(pontoSuperiorDireito.cor);
+        listaDePossiveisCores.push(pontoInferiorEsquerdo.cor);
+        listaDePossiveisCores.push(pontoInferiorDireito.cor);
 
-        // Cria Uma Lista De Cores E Uma De Valores
-        let listaDeCores = [];
-        let listaDeValores = [];
+        // Remove Cores Duplicadas
+        listaDePossiveisCores = [...new Set(listaDePossiveisCores)];
 
-        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
-        if (pontoSuperiorEsquerdo.cor != null) {
-            listaDeCores.push(pontoSuperiorEsquerdo.cor);
-            listaDeValores.push(valorSuperiorEsquerdo);
-        }
+        // Pega O Número De Cores
+        let numeroDeCores = listaDePossiveisCores.length;
 
-        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
-        if (pontoSuperiorDireito.cor != null) {
-            listaDeCores.push(pontoSuperiorDireito.cor);
-            listaDeValores.push(valorSuperiorDireito);
-        }
+        // Retira Valores NULL
+        listaDePossiveisCores = listaDePossiveisCores.filter((value) => {return value != null})
 
-        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
-        if (pontoInferiorEsquerdo.cor != null) {
-            listaDeCores.push(pontoInferiorEsquerdo.cor);
-            listaDeValores.push(valorInferiorDireito);
-        }
+        // Cria Uma Forma Por Cor
+        listaDePossiveisCores.forEach(cor => {
+            // Se A Cor For Diferente Da Atual E O Valor Do Ponto É Positivo, Inverte O Valor
+            let valorSuperiorEsquerdo = pontoSuperiorEsquerdo.valor * ((!coresSaoIguais(pontoSuperiorEsquerdo.cor,cor)) && pontoSuperiorEsquerdo.valor >= 0 ? -1:1);
+            let valorSuperiorDireito = pontoSuperiorDireito.valor * ((!coresSaoIguais(pontoSuperiorDireito.cor,cor)) && pontoSuperiorDireito.valor >= 0 ? -1:1);
+            let valorInferiorDireito = pontoInferiorDireito.valor * ((!coresSaoIguais(pontoInferiorDireito.cor,cor)) && pontoInferiorDireito.valor >= 0 ? -1:1);
+            let valorInferiorEsquerdo = pontoInferiorEsquerdo.valor * ((!coresSaoIguais(pontoInferiorEsquerdo.cor,cor)) && pontoInferiorEsquerdo.valor >= 0 ? -1:1);
 
-        // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
-        if (pontoInferiorDireito.cor != null) {
-            listaDeCores.push(pontoInferiorDireito.cor);
-            listaDeValores.push(valorInferiorEsquerdo);
-        }
-
-        // Calcula A Cor Total Do Quadrado Do Marching Squares
-        let corFigura = this.calculoDeCor(listaDeCores,listaDeValores);
-
-        // Retira As Linhas E Preenche Com A Cor Calculada
-        if (corFigura != null) {
-            noStroke();
-            fill(corFigura);
-        }
-
-        // Começa A Figura
-        beginShape();
-
-        // Baseado No Indice É Decido Quais Dos Pontos Devem Ser Adicionados À Figura
-        switch (marchingSquareIndice) {
-            case 0:
-                break;
-
-            case 1:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                break;
-                
-            case 2:
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                break;
+            // Converte O Valor Dos Pontos Em Um Número Total Binário Que É Usado Como O Indice Do Algoritmo
+            let marchingSquareIndice = (valorSuperiorEsquerdo >= 0) * 8 + (valorSuperiorDireito >= 0) * 4 + (valorInferiorDireito >= 0) * 2 + (valorInferiorEsquerdo >= 0) * 1;
             
-            case 3:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                break;
-        
-            case 4:
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                break;
+            // Converte Todos Os Valores Para Positivo
+            valorSuperiorEsquerdo = Math.abs(pontoSuperiorEsquerdo.valor);
+            valorSuperiorDireito = Math.abs(pontoSuperiorDireito.valor);
+            valorInferiorDireito = Math.abs(pontoInferiorDireito.valor);
+            valorInferiorEsquerdo = Math.abs(pontoInferiorEsquerdo.valor);
     
-            case 5:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                break;
+            // Criação Dos Pontos Entre Os Pontos De Referencia
+            let pontoMeioCima = createVector(pontoSuperiorEsquerdo.posicao.x + (valorSuperiorEsquerdo/(valorSuperiorEsquerdo + valorSuperiorDireito)) * this.espacoEntrePontos,pontoSuperiorEsquerdo.posicao.y);
+            let pontoMeioEsquerdo = createVector(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y + (valorSuperiorEsquerdo/(valorSuperiorEsquerdo + valorInferiorEsquerdo)) * this.espacoEntrePontos);
+            let pontoMeioDireito = createVector(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y + (valorSuperiorDireito/(valorSuperiorDireito + valorInferiorDireito)) * this.espacoEntrePontos);
+            let pontoMeioBaixo = createVector(pontoInferiorEsquerdo.posicao.x + (valorInferiorEsquerdo/(valorInferiorEsquerdo + valorInferiorDireito)) * this.espacoEntrePontos,pontoInferiorEsquerdo.posicao.y)
+    
+            // Cria Uma Lista De Cores E Uma De Valores
+            let listaDeCores = [];
+            let listaDeValores = [];
+    
+            // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
+            if (pontoSuperiorEsquerdo.cor != null && coresSaoIguais(pontoSuperiorEsquerdo.cor,cor)) {
+                listaDeCores.push(pontoSuperiorEsquerdo.cor);
+                listaDeValores.push(valorSuperiorEsquerdo);
+            }
+    
+            // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
+            if (pontoSuperiorDireito.cor != null && coresSaoIguais(pontoSuperiorDireito.cor,cor)) {
+                listaDeCores.push(pontoSuperiorDireito.cor);
+                listaDeValores.push(valorSuperiorDireito);
+            }
+    
+            // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
+            if (pontoInferiorEsquerdo.cor != null && coresSaoIguais(pontoInferiorEsquerdo.cor,cor)) {
+                listaDeCores.push(pontoInferiorEsquerdo.cor);
+                listaDeValores.push(valorInferiorDireito);
+            }
+    
+            // Se A Cor For NULL, Ela Não Deve Ser Adicionado As Listas
+            if (pontoInferiorDireito.cor != null && coresSaoIguais(pontoInferiorDireito.cor,cor)) {
+                listaDeCores.push(pontoInferiorDireito.cor);
+                listaDeValores.push(valorInferiorEsquerdo);
+            }
+    
+            // Calcula A Cor Total Do Quadrado Do Marching Squares
+            let corFigura = this.calculoDeCor(listaDeCores,listaDeValores);
+    
+            // Retira As Linhas E Preenche Com A Cor Calculada
+            if (corFigura != null) {
+                noStroke();
+                fill(corFigura);
+            }
+    
+            // Começa A Figura
+            beginShape();
+    
+            // Baseado No Indice É Decido Quais Dos Pontos Devem Ser Adicionados À Figura
+            switch (marchingSquareIndice) {
+                case 0:
+                    break;
+    
+                case 1:
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
 
-            case 6:
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                break;
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
 
-            case 7:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                break;
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
 
-            case 8:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y)
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                break;
+                    break;
+                    
+                case 2:
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
 
-            case 9:
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                break;
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
 
-            case 10:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                break;
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
+                    break;
+                
+                case 3:
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    break;
+            
+                case 4:
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
 
-            case 11:
-                vertex(pontoMeioCima.x,pontoMeioCima.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                break;
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
 
-            case 12:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                break;
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
+                    break;
+        
+                case 5:
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    break;
+    
+                case 6:
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    break;
+    
+                case 7:
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
 
-            case 13:
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoMeioDireito.x,pontoMeioDireito.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                break;
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
 
-            case 14:
-                vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
-                vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                break;
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
+                    break;
+    
+                case 8:
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
 
-            case 15:
-                vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
-                vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
-                vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
-                vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
-                break;
-        }
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
 
-        // Termina A Figura
-        endShape(CLOSE);
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
+                    break;
+    
+                case 9:
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    break;
+    
+                case 10:
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    break;
+    
+                case 11:
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    vertex(pontoMeioCima.x,pontoMeioCima.y);
+
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
+
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
+                    break;
+    
+                case 12:
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    break;
+    
+                case 13:
+                    vertex(pontoMeioDireito.x,pontoMeioDireito.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
+
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
+
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
+                    break;
+    
+                case 14:
+                    vertex(pontoMeioBaixo.x,pontoMeioBaixo.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    vertex(pontoMeioEsquerdo.x,pontoMeioEsquerdo.y);
+
+                    // Se Tiver Mais De 2 Cores, Adiciona Um Ponto No Meio
+                    if (numeroDeCores >= 3) {
+                        let pontoDoMeio = createVector(
+                            (pontoMeioCima.x + pontoMeioBaixo.x) / 2,
+                            (pontoMeioEsquerdo.y + pontoMeioDireito.y) / 2
+                        );
+
+                        vertex(pontoDoMeio.x,pontoDoMeio.y);
+                    }
+                    break;
+    
+                case 15:
+                    vertex(pontoSuperiorEsquerdo.posicao.x,pontoSuperiorEsquerdo.posicao.y);
+                    vertex(pontoSuperiorDireito.posicao.x,pontoSuperiorDireito.posicao.y);
+                    vertex(pontoInferiorDireito.posicao.x,pontoInferiorDireito.posicao.y);
+                    vertex(pontoInferiorEsquerdo.posicao.x,pontoInferiorEsquerdo.posicao.y);
+                    break;
+            }
+    
+            // Termina A Figura
+            endShape(CLOSE);
+        });
     }
 
     // Desenha O Contorno Do Algoritmo De Marching Squares
@@ -328,7 +451,7 @@ class Grid {
         // Desenha O Resultado Do Algoritmo De Marching Squares
         for (let x = 0; x < this.numeroDePontos.x-1; x++)
             for (let y = 0; y < this.numeroDePontos.y-1; y++) {
-                this.desenharMeioDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
+                this.desenhoDeCadaQuadradoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
                 // this.desenharContornoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
             }
     }

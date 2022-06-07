@@ -33,24 +33,27 @@ class Metaball {
         let vetorEntrePontoPosicaoECentro = createVector(this.posicao.x - ponto.posicao.x, this.posicao.y - ponto.posicao.y);
         let distancia = sqrt(Math.pow(vetorEntrePontoPosicaoECentro.x,2) + Math.pow(vetorEntrePontoPosicaoECentro.y,2));
 
+        let valorAtual = this.raio - distancia;
+
         // Checa Se O Ponto Está Dentro Do Metaball Mais Uma Resolução Do Grid
-        if (distancia < (this.raio + resolucaoDoGrid)) {
+        if (distancia <= (this.raio + resolucaoDoGrid)) {
             // Calcula A Cor Do Ponto
-            if (ponto.cor == null)
-                ponto.cor = this.cor;
-            else
-                ponto.cor = lerpColor(ponto.cor,this.cor, 0.5);
+            if (distancia <= this.raio)
+                if (ponto.cor == null)
+                    ponto.cor = this.cor;
+                else
+                    ponto.cor = lerpColor(ponto.cor,this.cor, 0.5);
 
             // Calcula O Valor Do Ponto
             if (ponto.valor > 0) 
-                ponto.valor = ponto.valor;
+                ponto.valor = Math.abs(valorAtual);
             else if (ponto.valor < -(resolucaoDoGrid*2))
-                ponto.valor = this.raio - distancia;
+                ponto.valor = valorAtual;
             else
-                if (this.raio - distancia >= 0)
-                    ponto.valor = this.raio - distancia;
+                if (valorAtual >= 0)
+                    ponto.valor = valorAtual;
                 else 
-                    ponto.valor = Math.abs(ponto.valor + (this.raio - distancia) / 4);
+                    ponto.valor = Math.abs((ponto.valor + valorAtual) / 4);
         }
     }
 

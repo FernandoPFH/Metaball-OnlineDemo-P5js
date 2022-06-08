@@ -1,13 +1,59 @@
 <html>
     <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js" integrity="sha512-NxocnqsXP3zm0Xb42zqVMvjQIktKEpTIbCXXyhBPxqGZHqhcOXHs4pXI/GoZ8lE+2NJONRifuBpi9DxC58L0Lw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script defer src="Bibliotecas/fontawesome/js/all.min.js"></script>
+        <script src="Src/menu.js"></script>
         <script src="Src/Classes/metaball.js"></script>
         <script src="Src/Classes/ponto.js"></script>
         <script src="Src/Classes/grid.js"></script>
         <script src="Src/main.js"></script>
         <link rel="stylesheet" href="Src/main.css">
+
+        <title>Metaballs - Online Demo</title>
     </head>
     <body>
         <main></main>
+        <h1 class="Titulo">
+            Metaballs - Online Demo 
+        </h1>
+        <div class="Grupo-De-Botoes-Flutuantes">
+            <div class="Botao-Flutuante" onclick="abrirMenuLateralDeConfiguracoes()">
+                <i class="fas fa-cog"></i>
+            </div>
+        </div>
+        <div class="Menu-Lateral" id="MenuLateralDeConfiguracoes">
+            <h1>Configurações:</h1>
+            <div onclick="fecharMenuLateralDeConfiguracoes()">
+                <span class="Botao-Fechar-Menu-Lateral">X</span>
+            </div>
+            <div class="Configuracao">
+                <div class="Linha-De-Configuracao">
+                    <h3>Desenhar Pontos:</h3>
+                    <input type="checkbox" id="desenharPontos">
+                </div>
+                <div class="Linha-De-Configuracao">
+                    <h3>Desenhar Meio Do Algoritmo:</h3>
+                    <input type="checkbox" id="desenharMeioDoAlgoritmo" checked>
+                </div>
+                <div class="Linha-De-Configuracao">
+                    <h3>Desenhar Contorno Do Algoritmo:</h3>
+                    <input type="checkbox" id="desenharContornoDoAlgoritmo">
+                </div>
+                <div class="Linha-De-Configuracao">
+                    <h3>Espaço Entre Pontos:</h3>
+                    <input type="range" id="espacoEntrePontos" value="25" min="1">
+                    <h3 id="espacoEntrePontosMostragem" style="margin: 3px;"></h3>
+                </div>
+                <div class="Linha-De-Configuracao">
+                    <h3>Número De Metaballs:</h3>
+                    <input type="range" id="numeroDeMetaballs" value="15" min="1">
+                    <h3 id="numeroDeMetaballsMostragem" style="margin: 3px;"></h3>
+                </div>
+                <div class="Linha-De-Configuracao">
+                    <h3>Desenhar Contorno Das Metaballs:</h3>
+                    <input type="checkbox" id="desenharContornoDasMetaballs">
+                </div>
+            </div>
+        </div>
     </body>
 </html>

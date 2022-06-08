@@ -1,16 +1,8 @@
+// Checa Se As Cores São Iguais
 function coresSaoIguais(corA,corB) {
     if (corA == null || corB == null)
         return false;
     return corA.levels[0] == corB.levels[0] && corA.levels[1] == corB.levels[1] && corA.levels[2] == corB.levels[2] && corA.levels[3] == corB.levels[3];
-}
-
-function corEstaNaLista(listaDeCores, cor) {
-    listaDeCores.forEach(corDaLista => {
-        if (coresSaoIguais(corDaLista,cor))
-            return true;
-    });
-
-    return false;
 }
 
 class Grid {
@@ -22,7 +14,7 @@ class Grid {
 
     // Atualiza A Lista De Pontos
     atualizarListaDePontos() {
-        this.numeroDePontos = createVector((int)(width/this.espacoEntrePontos) + 1,(int)(height/this.espacoEntrePontos) + 2);
+        this.numeroDePontos = createVector((int)(width/this.espacoEntrePontos) + 2,(int)(height/this.espacoEntrePontos) + 2);
 
         // Cria Uma Lista De 2 Dimensões Com O Tamanho Do Número De Pontos
         let pontos = new Array(this.numeroDePontos.x);

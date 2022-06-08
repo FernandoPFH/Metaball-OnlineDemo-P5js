@@ -50,9 +50,9 @@ function draw() {
     grid.desenhar();
 
     // Desenha Todas As Metaballs
-    // metaballs.forEach(metaball => {
-    //     metaball.desenhar();
-    // });
+    metaballs.forEach(metaball => {
+        metaball.desenhar();
+    });
 }
 
 // Troca O Tamanho Do Canvas Quando O Tamanho Da Tela É Mudado

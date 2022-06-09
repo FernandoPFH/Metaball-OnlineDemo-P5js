@@ -29,29 +29,29 @@
             <div class="Configuracao">
                 <div class="Linha-De-Configuracao">
                     <h3>Desenhar Pontos:</h3>
-                    <input type="checkbox" id="desenharPontos">
+                    <input type="checkbox" id="desenharPontos" onclick="mudarEstadoDesenharPontos()">
                 </div>
                 <div class="Linha-De-Configuracao">
                     <h3>Desenhar Meio Do Algoritmo:</h3>
-                    <input type="checkbox" id="desenharMeioDoAlgoritmo" checked>
+                    <input type="checkbox" id="desenharMeioDoAlgoritmo" onclick="mudarEstadoDesenharMeioDoMarchingSquqres()" checked>
                 </div>
                 <div class="Linha-De-Configuracao">
                     <h3>Desenhar Contorno Do Algoritmo:</h3>
-                    <input type="checkbox" id="desenharContornoDoAlgoritmo">
+                    <input type="checkbox" id="desenharContornoDoAlgoritmo"onclick="mudarEstadoDesenharContornoDoMarchingSquares()">
                 </div>
                 <div class="Linha-De-Configuracao">
                     <h3>Espaço Entre Pontos:</h3>
-                    <input type="range" id="espacoEntrePontos" value="25" min="1">
-                    <h3 id="espacoEntrePontosMostragem" style="margin: 3px;"></h3>
+                    <input type="range" id="espacoEntrePontos" value="10" min="1">
+                    <h3 id="espacoEntrePontosMostragem" style="margin: 3px;">10</h3>
                 </div>
                 <div class="Linha-De-Configuracao">
                     <h3>Número De Metaballs:</h3>
-                    <input type="range" id="numeroDeMetaballs" value="15" min="1">
-                    <h3 id="numeroDeMetaballsMostragem" style="margin: 3px;"></h3>
+                    <input type="range" id="numeroDeMetaballs" value="5" min="1">
+                    <h3 id="numeroDeMetaballsMostragem" style="margin: 3px;">5</h3>
                 </div>
                 <div class="Linha-De-Configuracao">
                     <h3>Desenhar Contorno Das Metaballs:</h3>
-                    <input type="checkbox" id="desenharContornoDasMetaballs">
+                    <input type="checkbox" id="desenharContornoDasMetaballs"onclick="mudarEstadoDesenharContornoDasMetaballs()">
                 </div>
             </div>
         </div>

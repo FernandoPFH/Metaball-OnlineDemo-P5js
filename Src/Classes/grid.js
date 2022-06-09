@@ -9,6 +9,10 @@ class Grid {
     constructor (espacoEntrePontos) {
         this.espacoEntrePontos = espacoEntrePontos;
 
+        this.desenharPontos = false;
+        this.desenharMeioDoAlgoritmo = true;
+        this.desenharContornoDoAlgoritmo = false;
+
         this.atualizarListaDePontos();
     }
 
@@ -434,17 +438,21 @@ class Grid {
     // Desenha O Grid
     desenhar() {
         // Loopa Por Todos Os Pontos E Desenha Eles
-        // this.pontos.forEach(linhaDePontos => {
-        //     linhaDePontos.forEach(ponto => {
-        //         ponto.desenhar();
-        //     });
-        // });
+        if (this.desenharPontos)
+            this.pontos.forEach(linhaDePontos => {
+                linhaDePontos.forEach(ponto => {
+                    ponto.desenhar();
+                });
+            });
 
         // Desenha O Resultado Do Algoritmo De Marching Squares
-        for (let x = 0; x < this.numeroDePontos.x-1; x++)
-            for (let y = 0; y < this.numeroDePontos.y-1; y++) {
-                this.desenhoDeCadaQuadradoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
-                // this.desenharContornoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
-            }
+        if (this.desenharMeioDoAlgoritmo || this.desenharContornoDoAlgoritmo)
+            for (let x = 0; x < this.numeroDePontos.x-1; x++)
+                for (let y = 0; y < this.numeroDePontos.y-1; y++) {
+                    if (this.desenharMeioDoAlgoritmo)
+                        this.desenhoDeCadaQuadradoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
+                    if (this.desenharContornoDoAlgoritmo)
+                        this.desenharContornoDoMarchingSquares(this.pontos[x][y],this.pontos[x+1][y],this.pontos[x][y+1],this.pontos[x+1][y+1]);
+                }
     }
 }

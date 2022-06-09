@@ -162,13 +162,17 @@ canvas {
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 5px;
     margin-top: 5px;
     margin-bottom: 10px;
 }
 
+.Linha-De-Configuracao h3 {
+    white-space: nowrap;
+}
+
 .Linha-De-Configuracao input {
     margin-left: auto;
+    width: auto;
 }
 
 .BotaoDeBaixarGrafo {

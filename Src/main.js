@@ -4,6 +4,8 @@ var tamanhoAtualCanvas;
 var resolucaoDoGrid = 10;
 var numeroDeMetaballs = 5;
 
+var desenharContornoMetaballs = false;
+
 var grid;
 var metaballs = [];
 
@@ -11,6 +13,7 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     tamanhoAtualCanvas = createVector(windowWidth, windowHeight);
 
+    // Trava Os Frames Por Segundo Em 30
     frameRate(30);
 
     // Instancia O Grid
@@ -28,6 +31,10 @@ function setup() {
 
 function draw() {
     background(51);
+
+    // Aplica Mudanças Feitas No Menu Lateral
+    atualizarTotalDePontosNoGrid();
+    atualizarTotalDeMetaballs();
 
     // Move Todas As Metaballs
     metaballs.forEach(metaball => {
@@ -50,9 +57,10 @@ function draw() {
     grid.desenhar();
 
     // Desenha Todas As Metaballs
-    metaballs.forEach(metaball => {
-        metaball.desenhar();
-    });
+    if (desenharContornoMetaballs)
+        metaballs.forEach(metaball => {
+            metaball.desenhar();
+        });
 }
 
 // Troca O Tamanho Do Canvas Quando O Tamanho Da Tela É Mudado
